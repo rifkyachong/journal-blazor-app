@@ -1,0 +1,22 @@
+﻿@typeparam TItem
+
+<div class="row">
+        @if (GridItem != null)
+        {
+            @foreach (var item in ItemList)
+            {
+                <div class="col-4">
+                    @GridItem(item)
+                </div>
+            }
+        }
+</div>
+
+@code {
+    [Parameter]
+    public RenderFragment<TItem>? GridItem { get; set; }
+
+    [Parameter]
+    public List<TItem> ItemList { get; set; } = new List<TItem>();
+
+}

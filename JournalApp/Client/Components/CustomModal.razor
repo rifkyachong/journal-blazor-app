@@ -1,0 +1,56 @@
+﻿<div class="modal fade @(ModalIsOpen? "show" : "")" id="@id" style="display: @(ModalIsOpen? "block;" : "none;")" data-bs-keyboard="false" tabindex="-1" aria-labelledby="journal-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                @if (Header != null)
+                {
+                    @Header
+                }
+            </div>
+            <div class="modal-body">
+                @if (Body != null)
+                {
+                    @Body
+                }
+            </div>
+            <div class="modal-footer">
+                @if (Footer != null) {
+                    @Footer
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-backdrop fade @(BackdropIsUsed && ModalIsOpen ? "show" : "")" style="display: @(BackdropIsUsed && ModalIsOpen ? "block;" : "none;")"></div>
+
+
+
+
+@code {
+    [Parameter]
+    public RenderFragment? Header { get; set; }
+
+    [Parameter]
+    public RenderFragment? Body { get; set; }
+
+    [Parameter]
+    public RenderFragment? Footer { get; set; }
+
+    [Parameter]
+    public string? id { get; set; }
+
+    private bool ModalIsOpen { get; set; } = false;
+
+    private bool BackdropIsUsed { get; set; } = true;
+
+    public void OpenModal()
+    {
+        ModalIsOpen = true;
+    }
+
+    public void CloseModal()
+    {
+        ModalIsOpen = false;
+    }
+}

@@ -1,0 +1,39 @@
+﻿@using JournalApp.Shared;
+
+<EditForm Model="@JournalToSubmit" OnValidSubmit="@SubmitJournal">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <InputText AdditionalAttributes="@InputAttributes" @bind-Value="JournalToSubmit.Title" />
+    <InputTextArea AdditionalAttributes="@TextAreaAttributes" @bind-Value="JournalToSubmit.Content" />
+    <div class="d-flex justify-content-end align-items-center">
+        @JournalToSubmit.Content.Length/2400
+        <button type="submit" class="btn btn-sm btn-success ms-3">Submit New Journal</button>
+    </div>
+</EditForm>
+
+@code {
+    public Journal JournalToSubmit { get; set; }
+
+    public void SubmitJournal()
+    {
+
+    }
+
+
+    private IReadOnlyDictionary<string, object> InputAttributes = new Dictionary<string, object>()
+{
+        {"class", "form-control mb-3" },
+        {"type", "text" },
+        {"placeholder", "Write the title here..." }
+    };
+
+    private IReadOnlyDictionary<string, object> TextAreaAttributes = new Dictionary<string, object>()
+{
+    {"class", "form-control mb-3" },
+    {"style", "height: 10rem; resize: none;" },
+    {"placeholder", "Write your journal here..." }
+};
+
+
+}

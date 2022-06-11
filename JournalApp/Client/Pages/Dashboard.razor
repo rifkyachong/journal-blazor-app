@@ -1,0 +1,118 @@
+﻿@page "/dashboard"
+@inject IJournalService JournalService
+
+<PageTitle>Dashboard</PageTitle>
+
+<EditForm Model="@JournalToSubmit" OnValidSubmit="@SubmitJournal">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <InputText AdditionalAttributes="@InputAttributes" @bind-Value="JournalToSubmit.Title" />
+    <InputTextArea AdditionalAttributes="@TextAreaAttributes" @bind-Value="JournalToSubmit.Content" />
+    <div class="d-flex justify-content-end align-items-center">
+        @JournalToSubmit.Content.Length/2400
+        <button type="submit" class="btn btn-sm btn-success ms-3">Submit New Journal</button>
+    </div>
+</EditForm>
+
+<h3>My Journal</h3>
+
+@if (JournalList is null)
+{
+    <p><em>Loading...</em></p>
+} else {
+    <CustomGrid ItemList="@JournalList">
+        <GridItem Context="Item">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">@Item.Title</h5>
+                    <p class="card-text">@Item.Content</p>
+                    <button type="button" class="btn btn-primary" @onclick="() => OpenJournal(Item)">Open Journal</button>
+                </div>
+            </div>
+        </GridItem>
+    </CustomGrid>
+}
+
+<CustomModal id="journal-modal" @ref="JournalModal">
+    <Header>
+        <h5 class="modal-title">Edit Journal</h5>
+        <button type="button" class="btn-close" aria-label="Close" @onclick="JournalModal.CloseModal"></button>
+    </Header>
+    <Body>
+        @if (OnEdit)
+        {
+            <form>
+                <input class="form-control mb-3" type="text" placeholder="Write the title here..." @bind-value="JournalToDisplay.Title" @bind-value:event="oninput" disabled />
+                <textarea style="height: 10rem; resize: none;" class="form-control mb-3" type="text" placeholder="Write your journal here..." @bind-value="JournalToDisplay.Content" @bind-value:event="oninput" disabled />
+                <div class="d-flex justify-content-end align-items-center">
+                    @JournalToDisplay.Content.Length/2400
+                </div>
+            </form>
+        } else {
+            <h4>@JournalToDisplay.Title</h4>
+            <p>@JournalToDisplay.Content</p>
+        }
+    </Body>
+    <Footer>
+        @if (OnEdit)
+        {
+            <button type="button" class="btn btn-info" @onclick="UpdateJournal">Save Changes<span class="oi oi-check"></span></button>
+            <button type="button" class="btn btn-danger" @onclick="JournalModal.CloseModal">Abort <span class="oi oi-x"></span></button>
+        } else
+        {
+
+            <button type="button" class="btn btn-success" @onclick="() => OnEdit = true">Edit <span class="oi oi-pencil"></span></button>
+        }
+    </Footer>
+</CustomModal>
+
+@code {
+    private List<Journal>? JournalList { get; set; }
+
+    private JournalDisplay JournalToSubmit { get; set; } = new JournalDisplay();
+
+    private JournalDisplay JournalToDisplay { get; set; } = new JournalDisplay();
+
+    private CustomModal JournalModal;
+
+    private bool OnEdit { get; set; } = false;
+
+    private IReadOnlyDictionary<string, object> InputAttributes = new Dictionary<string, object>()
+    {
+        {"class", "form-control mb-3" },
+        {"type", "text" },
+        {"placeholder", "Write the title here..." }
+    };
+
+    private IReadOnlyDictionary<string, object> TextAreaAttributes = new Dictionary<string, object>()
+    {
+        {"class", "form-control mb-3" },
+        {"style", "height: 10rem; resize: none;" },
+        {"placeholder", "Write your journal here..." }
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        JournalList = await JournalService.GetAllJournals();
+    }
+
+    private async Task SubmitJournal()
+    {
+        await JournalService.PostJournal(JournalToSubmit);
+        JournalList = await JournalService.GetAllJournals();
+        JournalToSubmit = new JournalDisplay();
+    }
+
+    private void OpenJournal(Journal opened)
+    {
+        JournalToDisplay.Title = opened.Title;
+        JournalToDisplay.Content = opened.Content;
+        JournalModal.OpenModal();
+    }
+
+    private void UpdateJournal()
+    {
+
+    }
+}
